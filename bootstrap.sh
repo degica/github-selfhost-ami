@@ -3,13 +3,18 @@
 set -euxo pipefail
 
 # See https://github.com/actions/runner/releases
-RUNNER_VERSION="2.294.0"
-EXPECTED_SHA256="98c34d401105b83906fd988c184b96d1891eaa1b28856020211fee4a9c30bc2b"
+RUNNER_VERSION="2.303.0"
+EXPECTED_SHA256="53f137fb4c00ac9906cbdf4b7c5c14e2e9555a2843d5c0171f6368207472464d"
 
 apt-get update
-apt-get install -y apt-transport-https ca-certificates curl gnupg
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo 'deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu bionic stable' > /etc/apt/sources.list.d/docker.list
+apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
+# curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+# echo 'deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu jammy stable' > /etc/apt/sources.list.d/docker.list
+
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 apt-get update
 apt-get install -y jq at git docker-ce docker-ce-cli containerd.io openssl libssl-dev pkg-config
